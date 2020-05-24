@@ -6,7 +6,7 @@
         </div>
     </div>
     <div class="content-right" v-if="lists && lists.length">
-       <Cascader-item :options="lists" :level="level+1" @change="change" :value="value"></Cascader-item>
+       <Cascader-item :options="lists"  :level="level+1" @change="change" :value="value"></Cascader-item>
     </div>
   </div>
 </template>
@@ -38,6 +38,11 @@ export default {
   },
   computed: {
     lists () {
+      if (this.value[this.level] && this.value[this.level].id) {
+        const o = this.options.find(item => { return item.id === this.value[this.level].id })
+        return o.children
+      }
+
       return this.value[this.level] && this.value[this.level].children
     }
   },
@@ -50,7 +55,7 @@ export default {
       // 因为子组件不能改变父组件的值 所以我们需要深拷贝一下
       const cloneValue = JSON.parse(JSON.stringify(this.value))
       // 当点击的第二级别的时候删除自己下一级别的所有数据
-      cloneValue.splice(this.level)
+      cloneValue.splice(this.level + 1)
       // 这里我们的level是每次都会加一的 然后让我们数组的每一位对应数据每一级的值
       cloneValue[this.level] = item
       // 选择好的值以后 我们需要向上传递
@@ -66,8 +71,10 @@ export default {
 }
 .content-left{
     border: 1px solid #ccc;
-    width: 40px;
+    width: 80px;
     padding: 8px;
+    height: 150px;
+    overflow-y:scroll;
     .label:hover{
         background: #ccc;
         cursor: pointer;
